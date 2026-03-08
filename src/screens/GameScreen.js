@@ -90,15 +90,6 @@ const GameScreen = ({ route, navigation }) => {
       setGameData(data);
       setSelectedBird(data.selectedBird || "yellow");
     });
-
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(floatAnim, { toValue: 1, duration: 1200, useNativeDriver: true }),
-        Animated.timing(floatAnim, { toValue: 0, duration: 1200, useNativeDriver: true }),
-      ])
-    ).start();
-
-    Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
   }, []);
 
   useEffect(() => {

@@ -176,24 +176,6 @@ const MenuScreen = ({ navigation }) => {
           </TouchableWithoutFeedback>
         </View>
 
-        {/* Stats row */}
-        {gameData && (
-          <View style={styles.statsRow}>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{gameData.gamesPlayed}</Text>
-              <Text style={styles.statLabel}>GAMES</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{gameData.totalScore}</Text>
-              <Text style={styles.statLabel}>TOTAL PTS</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>LV{gameData.bestLevel}</Text>
-              <Text style={styles.statLabel}>REACHED</Text>
-            </View>
-          </View>
-        )}
-
         {/* Coins display */}
         {gameData && (
           <View style={styles.coinDisplay}>
@@ -205,11 +187,11 @@ const MenuScreen = ({ navigation }) => {
 
         {/* Tabs */}
         <View style={styles.tabs}>
-          {["levels", "birds", "stats"].map((tab) => (
+          {["levels", "birds"].map((tab) => (
             <TouchableWithoutFeedback key={tab} onPress={() => setActiveTab(tab)}>
               <View style={[styles.tab, activeTab === tab && styles.tabActive]}>
                 <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-                  {tab === "levels" ? "LEVELS" : tab === "birds" ? "BIRDS" : "RECORDS"}
+                  {tab === "levels" ? "LEVELS" : "BIRDS"}
                 </Text>
               </View>
             </TouchableWithoutFeedback>
@@ -304,31 +286,6 @@ const MenuScreen = ({ navigation }) => {
             </View>
           )}
 
-          {activeTab === "stats" && (
-            <View style={styles.recordsContainer}>
-              {LEVELS.map((level) => {
-                const best = gameData?.bestScores[level.id] || 0;
-                const unlocked = isUnlocked(level);
-                return (
-                  <View key={level.id} style={[styles.recordRow, { borderLeftColor: level.color }]}>
-                    <Text style={styles.recordEmoji}>{level.emoji}</Text>
-                    <View style={styles.recordInfo}>
-                      <Text style={[styles.recordName, { color: unlocked ? level.color : "#444" }]}>
-                        {level.name}
-                      </Text>
-                      <Text style={styles.recordTarget}>
-                        Target: {level.scoreToAdvance === Infinity ? "∞" : level.scoreToAdvance}
-                      </Text>
-                    </View>
-                    <Text style={[styles.recordScore, { color: unlocked ? "#fff" : "#333" }]}>
-                      {best > 0 ? best : unlocked ? "0" : "🔒"}
-                    </Text>
-                  </View>
-                );
-              })}
-            </View>
-          )}
-
           <View style={{ height: 40 }} />
         </ScrollView>
       </Animated.View>
@@ -366,27 +323,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     letterSpacing: 12,
     marginTop: -4,
-  },
-  statsRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 24,
-    marginBottom: 20,
-    paddingHorizontal: 20,
-  },
-  statItem: {
-    alignItems: "center",
-  },
-  statValue: {
-    color: "#1E3A8A",
-    fontSize: 18,
-    fontWeight: "800",
-  },
-  statLabel: {
-    color: "rgba(30,58,138,0.6)",
-    fontSize: 9,
-    letterSpacing: 2,
-    marginTop: 2,
   },
   tabs: {
     flexDirection: "row",
@@ -508,40 +444,6 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: "800",
     letterSpacing: 1,
-  },
-  recordsContainer: {
-    gap: 10,
-  },
-  recordRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.9)",
-    borderRadius: 12,
-    padding: 14,
-    borderLeftWidth: 3,
-    gap: 12,
-  },
-  recordEmoji: {
-    fontSize: 24,
-  },
-  recordInfo: {
-    flex: 1,
-  },
-  recordName: {
-    fontSize: 13,
-    fontWeight: "800",
-    letterSpacing: 2,
-  },
-  recordTarget: {
-    color: "rgba(30,58,138,0.6)",
-    fontSize: 10,
-    letterSpacing: 1,
-    marginTop: 2,
-  },
-  recordScore: {
-    fontSize: 22,
-    fontWeight: "900",
-    color: "#1E3A8A",
   },
   coinDisplay: {
     flexDirection: "row",

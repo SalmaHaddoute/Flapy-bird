@@ -13,6 +13,11 @@ class DatabaseService {
       // Ouvrir ou créer la base de données
       this.db = await SQLite.openDatabaseAsync('skybird_adventure.db');
       
+      // Vérifier que la base de données est bien ouverte
+      if (!this.db) {
+        throw new Error('Failed to open database');
+      }
+      
       // Créer les tables
       await this.createTables();
       
@@ -20,6 +25,9 @@ class DatabaseService {
       console.log('🗄️ Database initialized successfully');
     } catch (error) {
       console.error('Database initialization failed:', error);
+      // Réinitialiser en cas d'erreur
+      this.db = null;
+      this.isInitialized = false;
     }
   }
 
@@ -104,7 +112,16 @@ class DatabaseService {
   // Sauvegarder un score
   async saveScore(levelId, score, coins = 0, birdColor = 'yellow') {
     try {
-      if (!this.db) await this.initialize();
+      // S'assurer que la base de données est initialisée
+      if (!this.db || !this.isInitialized) {
+        console.log('🔄 Reinitializing database...');
+        await this.initialize();
+      }
+      
+      // Vérifier à nouveau que la base de données est disponible
+      if (!this.db) {
+        throw new Error('Database not available');
+      }
 
       // Insérer le score dans l'historique
       await this.db.runAsync(
@@ -135,6 +152,23 @@ class DatabaseService {
       return true;
     } catch (error) {
       console.error('Error saving score:', error);
+      
+      // En cas d'erreur, essayer de réinitialiser la base de données
+      try {
+        console.log('🔄 Attempting to reset database...');
+        this.db = null;
+        this.isInitialized = false;
+        await this.initialize();
+        
+        // Réessayer la sauvegarde
+        if (this.db && this.isInitialized) {
+          console.log('🔄 Retrying score save...');
+          return await this.saveScore(levelId, score, coins, birdColor);
+        }
+      } catch (retryError) {
+        console.error('Retry failed:', retryError);
+      }
+      
       return false;
     }
   }
@@ -202,7 +236,16 @@ class DatabaseService {
   // Charger les données du jeu
   async loadGameData() {
     try {
-      if (!this.db) await this.initialize();
+      // S'assurer que la base de données est initialisée
+      if (!this.db || !this.isInitialized) {
+        console.log('🔄 Initializing database for loadGameData...');
+        await this.initialize();
+      }
+      
+      // Vérifier que la base de données est disponible
+      if (!this.db) {
+        throw new Error('Database not available for loading data');
+      }
 
       // Charger les meilleurs scores
       const bestScores = await this.db.getAllAsync(`SELECT level_id, best_score, best_coins, bird_color FROM best_scores ORDER BY level_id`);
@@ -235,6 +278,9 @@ class DatabaseService {
       return gameData;
     } catch (error) {
       console.error('Error loading game data:', error);
+      
+      // En cas d'erreur, retourner des données par défaut
+      console.log('🔄 Returning default game data');
       return {
         bestScores: {},
         totalScore: 0,

@@ -9,7 +9,7 @@ import {
   StatusBar,
 } from "react-native";
 import { LEVELS, BIRD_COLORS } from "../constants/gameConfig";
-import { saveScore, loadGameData, saveSelectedBird, savePowerUpCollected, initializeDatabase } from "../utils/storageV2";
+import { saveScore, loadGameData, saveSelectedBird, savePowerUpCollected, initializeDatabase } from "../utils/storageV3";
 import audioServiceV3 from "../services/audioServiceV3";
 
 const BirdPreview = ({ color, size = 44 }) => {

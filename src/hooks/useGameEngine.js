@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { SCREEN, BIRD, PIPE, GROUND, LEVELS, COIN, POWERUP } from "../constants/gameConfig";
 import audioServiceV3 from "../services/audioServiceV3";
-import { savePowerUpCollected } from "../utils/storageV2";
+import { savePowerUpCollected } from "../utils/storageV3";
 
 const PIPE_START_X = SCREEN.WIDTH + 100;
 

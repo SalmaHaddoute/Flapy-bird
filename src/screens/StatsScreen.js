@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from 'react-native';
-import { getDetailedStats, resetGameData } from '../utils/storageV2';
+import { getDetailedStats, resetGameData, initializeDatabase } from '../utils/storageV3';
 import audioServiceV3 from '../services/audioServiceV3';
 
 const { width, height } = Dimensions.get('window');

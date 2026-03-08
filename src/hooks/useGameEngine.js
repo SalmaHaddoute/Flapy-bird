@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { SCREEN, BIRD, PIPE, GROUND, LEVELS, COIN, POWERUP } from "../constants/gameConfig";
 import audioServiceV3 from "../services/audioServiceV3";
+import { savePowerUpCollected } from "../utils/storageV2";
 
 const PIPE_START_X = SCREEN.WIDTH + 100;
 
@@ -183,6 +184,10 @@ export const useGameEngine = (level, onGameOver, onScoreUpdate) => {
           // Son de power-up activé
           audioServiceV3.playPowerUp(pipe.powerUp.type);
           audioServiceV3.playVoiceOver('powerup_activated');
+          
+          // Enregistrer le power-up collecté dans SQLite
+          savePowerUpCollected(pipe.powerUp.type, level.id, scoreRef.current);
+          
           setTimeout(() => {
             setActivePowerUp(null);
             setPowerUpTimer(null);

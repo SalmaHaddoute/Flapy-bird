@@ -14,7 +14,7 @@ import Coin from "../components/Coin";
 import PowerUp from "../components/PowerUp";
 import { useGameEngine } from "../hooks/useGameEngine";
 import { SCREEN, GROUND, LEVELS, POWERUP } from "../constants/gameConfig";
-import { saveScore } from "../utils/storage";
+import { saveScore, loadGameData, saveSelectedBird, savePowerUpCollected, initializeDatabase } from "../utils/storageV2";
 import audioServiceV3 from "../services/audioServiceV3";
 
 const { width, height } = Dimensions.get("window");
@@ -81,6 +81,29 @@ const GameScreen = ({ route, navigation }) => {
 
   const { birdY, birdRotation, pipes, score, isAlive, particles, coins, activePowerUp, powerUpTimer, flap, startGame } =
     useGameEngine(level, handleGameOver, handleScoreUpdate);
+
+  useEffect(() => {
+    // Initialiser la base de données SQLite
+    initializeDatabase();
+    
+    loadGameData().then((data) => {
+      setGameData(data);
+      setSelectedBird(data.selectedBird || "yellow");
+    });
+
+    // Initialiser l'état audio
+    setSoundEnabled(audioServiceV3.soundEnabled);
+    setHapticEnabled(audioServiceV3.hapticEnabled);
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatAnim, { toValue: 1, duration: 1200, useNativeDriver: true }),
+        Animated.timing(floatAnim, { toValue: 0, duration: 1200, useNativeDriver: true }),
+      ])
+    ).start();
+
+    Animated.timing(fadeAnim, { toValue: 1, duration: 600, useNativeDriver: true }).start();
+  }, []);
 
   useEffect(() => {
     // Initialiser le service audio

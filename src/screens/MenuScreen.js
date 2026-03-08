@@ -9,7 +9,7 @@ import {
   StatusBar,
 } from "react-native";
 import { LEVELS, BIRD_COLORS } from "../constants/gameConfig";
-import { loadGameData, saveSelectedBird } from "../utils/storage";
+import { saveScore, loadGameData, saveSelectedBird, savePowerUpCollected, initializeDatabase } from "../utils/storageV2";
 import audioServiceV3 from "../services/audioServiceV3";
 
 const BirdPreview = ({ color, size = 44 }) => {
@@ -64,6 +64,9 @@ const MenuScreen = ({ navigation }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    // Initialiser la base de données SQLite
+    initializeDatabase();
+    
     loadGameData().then((data) => {
       setGameData(data);
       setSelectedBird(data.selectedBird || "yellow");
@@ -323,6 +326,13 @@ const MenuScreen = ({ navigation }) => {
                   </View>
                 );
               })}
+              
+              {/* Bouton pour statistiques détaillées */}
+              <TouchableWithoutFeedback onPress={() => navigation.navigate('Stats')}>
+                <View style={styles.detailedStatsButton}>
+                  <Text style={styles.detailedStatsButtonText}>📊 Voir Statistiques Détaillées</Text>
+                </View>
+              </TouchableWithoutFeedback>
             </View>
           )}
 
@@ -592,6 +602,19 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 1,
     color: "rgba(30,58,138,0.6)",
+  },
+  detailedStatsButton: {
+    backgroundColor: "#1a5490",
+    borderRadius: 12,
+    padding: 15,
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  detailedStatsButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
 

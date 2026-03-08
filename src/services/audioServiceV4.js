@@ -7,7 +7,7 @@ class AudioServiceV4 {
     this.backgroundMusic = null;
     this.isInitialized = false;
     this.soundEnabled = true;
-    this.hapticEnabled = true;
+    this.hapticEnabled = false; // Désactiver les vibrations par défaut
     this.backgroundMusicInterval = null;
   }
 
@@ -50,14 +50,16 @@ class AudioServiceV4 {
       for (const [key, soundFile] of Object.entries(soundFiles)) {
         try {
           const { sound } = await Audio.Sound.createAsync(soundFile);
+          // Ajuster le volume pour chaque son
+          await sound.setVolumeAsync(0.3); // Volume réduit à 30%
           this.sounds[key] = sound;
-          console.log(`🎵 Loaded ${key} sound`);
+          console.log(`🎵 Loaded ${key} sound with reduced volume`);
         } catch (error) {
           console.warn(`Failed to load ${key} sound:`, error);
         }
       }
       
-      console.log('🎵 All sounds loaded successfully');
+      console.log('🎵 All sounds loaded successfully with optimized volumes');
     } catch (error) {
       console.warn('Sound loading failed:', error);
     }
@@ -113,59 +115,38 @@ class AudioServiceV4 {
     }
   }
 
-  // Effets sonores avec vrais fichiers audio
+  // Effets sonores sans vibrations
   async playFlap() {
     await this.playSound('flap');
-    await this.playHaptic('light');
   }
 
   async playCoin() {
     await this.playSound('coin');
-    await this.playHaptic('success');
   }
 
   async playPowerUp(type) {
     const soundKey = `powerup_${type}`;
-    const played = await this.playSound(soundKey);
-    
-    switch (type) {
-      case 'shield':
-        await this.playHaptic('heavy');
-        break;
-      case 'slow':
-        await this.playHaptic('medium');
-        break;
-      case 'magnet':
-        await this.playHaptic('warning');
-        break;
-      default:
-        await this.playHaptic('medium');
-    }
-    
-    console.log(`🎵 ${type} power-up sound played ${played ? '(audio)' : '(haptic only)'}`);
+    await this.playSound(soundKey);
+    console.log(`🎵 ${type} power-up sound played (audio only)`);
   }
 
   async playCollision() {
     await this.playSound('collision');
-    await this.playHaptic('heavy');
   }
 
   async playScore() {
     await this.playSound('score');
-    await this.playHaptic('success');
   }
 
   async playCountdown() {
     await this.playSound('countdown');
-    await this.playHaptic('light');
   }
 
   async playGameOver() {
     await this.playSound('gameover');
-    await this.playHaptic('error');
   }
 
-  // Musique de fond avec haptics
+  // Musique de fond sans haptics
   async playBackgroundMusic(levelId = 1) {
     if (!this.soundEnabled) return;
     
@@ -174,7 +155,7 @@ class AudioServiceV4 {
       
       console.log(`🎵 Starting background music for level ${levelId}`);
       
-      // Créer une musique de fond avec des haptics
+      // Créer une musique de fond simple avec des sons
       const frequencies = {
         1: [220, 247, 262, 294, 330], // A3, B3, C4, D4, E4
         2: [247, 262, 294, 330, 349, 392], // B3, C4, D4, E4, F4, G4
@@ -193,12 +174,6 @@ class AudioServiceV4 {
         if (this.soundEnabled && notes.length > 0) {
           // Jouer un son de note simple
           await this.playSimpleNote(notes[noteIndex % notes.length], noteDuration * 0.8);
-          
-          // Haptics léger pour le rythme
-          if (this.hapticEnabled && noteIndex % 4 === 0) {
-            await this.playHaptic('light');
-          }
-          
           noteIndex++;
         }
       }, noteDuration);
@@ -210,12 +185,9 @@ class AudioServiceV4 {
 
   async playSimpleNote(frequency, duration) {
     try {
-      // Utiliser le son de score comme note de base avec une fréquence différente
-      // Pour l'instant, nous allons juste jouer le son de score
-      // Dans une vraie implémentation, vous pourriez avoir des fichiers audio pour chaque note
-      if (this.sounds.score) {
-        await this.sounds.score.replayAsync();
-      }
+      // Pour l'instant, pas de musique de fond pour éviter les sons parasites
+      // Vous pouvez activer cette fonctionnalité plus tard si vous voulez
+      return;
     } catch (error) {
       console.warn('Note playback failed:', error);
     }

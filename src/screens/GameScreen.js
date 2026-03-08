@@ -15,6 +15,7 @@ import PowerUp from "../components/PowerUp";
 import { useGameEngine } from "../hooks/useGameEngine";
 import { SCREEN, GROUND, LEVELS, POWERUP } from "../constants/gameConfig";
 import { saveScore } from "../utils/storage";
+import audioService from "../services/audioService";
 
 const { width, height } = Dimensions.get("window");
 
@@ -36,6 +37,8 @@ const GameScreen = ({ route, navigation }) => {
 
   const handleScoreUpdate = useCallback((score) => {
     setCurrentScore(score);
+    // Son de score
+    audioService.playScore();
     Animated.sequence([
       Animated.timing(scoreAnim, { toValue: 1.4, duration: 80, useNativeDriver: true }),
       Animated.timing(scoreAnim, { toValue: 1, duration: 120, useNativeDriver: true }),
@@ -48,13 +51,23 @@ const GameScreen = ({ route, navigation }) => {
       setFinalCoins(coins);
       setGameState("dead");
 
+      // Son de game over
+      audioService.playGameOver();
+      audioService.playVoiceOver('game_over');
+
       const prevBest = bestScores[levelId] || 0;
-      if (score > prevBest) setNewBest(true);
+      if (score > prevBest) {
+        setNewBest(true);
+        // Voix off pour meilleur score
+        audioService.playVoiceOver('best_score');
+      }
 
       await saveScore(levelId, score, coins);
 
       if (score >= level.scoreToAdvance && levelId < LEVELS.length) {
         setLevelUp(true);
+        // Voix off pour niveau débloqué
+        audioService.playVoiceOver('level_unlocked');
       }
 
       Animated.timing(deathAnim, {
@@ -70,6 +83,14 @@ const GameScreen = ({ route, navigation }) => {
     useGameEngine(level, handleGameOver, handleScoreUpdate);
 
   useEffect(() => {
+    // Initialiser le service audio
+    audioService.initialize();
+    
+    // Démarrer la musique de fond
+    if (gameState === "countdown") {
+      audioService.playBackgroundMusic(levelId);
+    }
+    
     if (gameState === "countdown") {
       let c = 3;
       setCountdown(c);
@@ -81,6 +102,8 @@ const GameScreen = ({ route, navigation }) => {
           startGame();
         } else {
           setCountdown(c);
+          // Son de countdown
+          audioService.playCountdown();
           Animated.sequence([
             Animated.timing(countdownAnim, { toValue: 1.8, duration: 200, useNativeDriver: true }),
             Animated.timing(countdownAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
@@ -89,11 +112,22 @@ const GameScreen = ({ route, navigation }) => {
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [gameState]);
+  }, [gameState, levelId]);
 
   const handleTap = useCallback(() => {
-    if (gameState === "playing") flap();
+    if (gameState === "playing") {
+      flap();
+      // Son de battement d'ailes
+      audioService.playFlap();
+    }
   }, [gameState, flap]);
+
+  useEffect(() => {
+    // Nettoyer l'audio quand on quitte l'écran
+    return () => {
+      audioService.stopBackgroundMusic();
+    };
+  }, []);
 
   const handleRestart = useCallback(() => {
     deathAnim.setValue(0);

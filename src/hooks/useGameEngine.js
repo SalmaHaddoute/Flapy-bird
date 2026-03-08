@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { SCREEN, BIRD, PIPE, GROUND, LEVELS, COIN, POWERUP } from "../constants/gameConfig";
+import audioService from "../services/audioService";
 
 const PIPE_START_X = SCREEN.WIDTH + 100;
 
@@ -155,6 +156,8 @@ export const useGameEngine = (level, onGameOver, onScoreUpdate) => {
         const magnetRange = activePowerUp === 'magnet' ? 100 : 30;
         if (distance < magnetRange) {
           newCoins += COIN.VALUE;
+          // Son de pièce collectée
+          audioService.playCoin();
           return { ...pipe, coin: { ...pipe.coin, collected: true } };
         }
       }
@@ -177,6 +180,9 @@ export const useGameEngine = (level, onGameOver, onScoreUpdate) => {
         if (distance < 30) {
           setActivePowerUp(pipe.powerUp.type);
           setPowerUpTimer(POWERUP.DURATION);
+          // Son de power-up activé
+          audioService.playPowerUp(pipe.powerUp.type);
+          audioService.playVoiceOver('powerup_activated');
           setTimeout(() => {
             setActivePowerUp(null);
             setPowerUpTimer(null);
@@ -202,6 +208,8 @@ export const useGameEngine = (level, onGameOver, onScoreUpdate) => {
     if (checkCollision(newBirdY, pipesWithPowerUps)) {
       isAliveRef.current = false;
       setIsAlive(false);
+      // Son de collision
+      audioService.playCollision();
       onGameOver(scoreRef.current, coins);
       return;
     }

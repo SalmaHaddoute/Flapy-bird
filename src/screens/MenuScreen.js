@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { LEVELS, BIRD_COLORS } from "../constants/gameConfig";
 import { loadGameData, saveSelectedBird } from "../utils/storage";
+import audioService from "../services/audioService";
 
 const BirdPreview = ({ color, size = 44 }) => {
   const c = BIRD_COLORS.find((b) => b.id === color) || BIRD_COLORS[0];
@@ -56,6 +57,8 @@ const MenuScreen = ({ navigation }) => {
   const [gameData, setGameData] = useState(null);
   const [selectedBird, setSelectedBird] = useState("yellow");
   const [activeTab, setActiveTab] = useState("levels"); // levels | birds | stats
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [hapticEnabled, setHapticEnabled] = useState(true);
 
   const floatAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -65,6 +68,10 @@ const MenuScreen = ({ navigation }) => {
       setGameData(data);
       setSelectedBird(data.selectedBird || "yellow");
     });
+
+    // Initialiser l'état audio
+    setSoundEnabled(audioService.soundEnabled);
+    setHapticEnabled(audioService.hapticEnabled);
 
     Animated.loop(
       Animated.sequence([
@@ -79,6 +86,16 @@ const MenuScreen = ({ navigation }) => {
   const handleSelectBird = useCallback(async (birdId) => {
     setSelectedBird(birdId);
     await saveSelectedBird(birdId);
+  }, []);
+
+  const toggleSound = useCallback(() => {
+    const newState = audioService.toggleSound();
+    setSoundEnabled(newState);
+  }, []);
+
+  const toggleHaptic = useCallback(() => {
+    const newState = audioService.toggleHaptic();
+    setHapticEnabled(newState);
   }, []);
 
   const handlePlayLevel = useCallback(
@@ -137,6 +154,23 @@ const MenuScreen = ({ navigation }) => {
           </Animated.View>
           <Text style={styles.title}>FLAPPY</Text>
           <Text style={styles.titleSub}>NOVA</Text>
+        </View>
+
+        {/* Audio Controls */}
+        <View style={styles.audioControls}>
+          <TouchableWithoutFeedback onPress={toggleSound}>
+            <View style={[styles.audioButton, soundEnabled && styles.audioButtonActive]}>
+              <Text style={styles.audioIcon}>{soundEnabled ? "🔊" : "🔇"}</Text>
+              <Text style={styles.audioLabel}>SOUND</Text>
+            </View>
+          </TouchableWithoutFeedback>
+          
+          <TouchableWithoutFeedback onPress={toggleHaptic}>
+            <View style={[styles.audioButton, hapticEnabled && styles.audioButtonActive]}>
+              <Text style={styles.audioIcon}>{hapticEnabled ? "📳" : "📵"}</Text>
+              <Text style={styles.audioLabel}>HAPTIC</Text>
+            </View>
+          </TouchableWithoutFeedback>
         </View>
 
         {/* Stats row */}
@@ -527,6 +561,37 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 1,
+  },
+  audioControls: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 16,
+    marginBottom: 16,
+    paddingHorizontal: 20,
+  },
+  audioButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.8)",
+    borderWidth: 1,
+    borderColor: "#E0F2FE",
+  },
+  audioButtonActive: {
+    backgroundColor: "#E0F2FE",
+    borderColor: "#87CEEB",
+  },
+  audioIcon: {
+    fontSize: 16,
+  },
+  audioLabel: {
+    fontSize: 10,
+    fontWeight: "700",
+    letterSpacing: 1,
+    color: "rgba(30,58,138,0.6)",
   },
 });
 

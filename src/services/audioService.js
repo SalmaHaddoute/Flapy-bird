@@ -1,5 +1,7 @@
 import { Audio } from 'expo-av';
 import * as Haptics from 'expo-haptics';
+import audioBufferGenerator from '../utils/audioBufferGenerator';
+import backgroundMusicGenerator from '../utils/backgroundMusicGenerator';
 
 class AudioService {
   constructor() {
@@ -21,21 +23,45 @@ class AudioService {
         shouldDuckAndroid: true,
         playThroughEarpieceAndroid: false,
       });
+      
+      // Pré-générer les buffers audio
+      await this.preloadSounds();
+      
       this.isInitialized = true;
     } catch (error) {
       console.warn('Audio initialization failed:', error);
     }
   }
 
-  // Créer des sons synthétiques car nous n'avons pas de fichiers audio
-  async createSound(frequency = 440, duration = 100) {
+  // Pré-charger tous les sons
+  async preloadSounds() {
     try {
-      // Créer un son simple avec l'API Web Audio (simulation)
-      const soundObject = new Audio.Sound();
-      return soundObject;
+      // Générer les buffers audio
+      this.audioBuffers = {
+        flap: audioBufferGenerator.generateFlapSound(),
+        coin: audioBufferGenerator.generateCoinSound(),
+        collision: audioBufferGenerator.generateCollisionSound(),
+        countdown: audioBufferGenerator.generateCountdownSound(),
+        gameOver: audioBufferGenerator.generateGameOverSound(),
+        score: audioBufferGenerator.generateScoreSound(),
+      };
+      
+      // Créer les objets sonores
+      for (const [key, buffer] of Object.entries(this.audioBuffers)) {
+        const dataURI = audioBufferGenerator.createAudioDataURI(buffer);
+        const soundObject = new Audio.Sound();
+        
+        try {
+          await soundObject.loadAsync({ uri: dataURI });
+          this.sounds[key] = soundObject;
+        } catch (error) {
+          console.warn(`Failed to load ${key} sound:`, error);
+        }
+      }
+      
+      console.log('🎵 All sounds preloaded successfully');
     } catch (error) {
-      console.warn('Sound creation failed:', error);
-      return null;
+      console.warn('Sound preloading failed:', error);
     }
   }
 
@@ -44,10 +70,12 @@ class AudioService {
     if (!this.soundEnabled) return;
     
     try {
-      // Son de battement d'ailes - fréquence medium courte
+      // Jouer le son de battement d'ailes
+      if (this.sounds.flap) {
+        await this.sounds.flap.replayAsync();
+      }
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      // Simulation sonore - dans une vraie app, vous chargeriez un fichier audio
-      console.log('🎵 Flap sound');
+      console.log('🎵 Flap sound played');
     } catch (error) {
       console.warn('Flap sound failed:', error);
     }
@@ -57,9 +85,12 @@ class AudioService {
     if (!this.soundEnabled) return;
     
     try {
-      // Son de pièce - fréquence haute, son cristallin
+      // Jouer le son de pièce
+      if (this.sounds.coin) {
+        await this.sounds.coin.replayAsync();
+      }
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      console.log('🎵 Coin sound - ting!');
+      console.log('🎵 Coin sound played');
     } catch (error) {
       console.warn('Coin sound failed:', error);
     }
@@ -69,23 +100,35 @@ class AudioService {
     if (!this.soundEnabled) return;
     
     try {
-      // Son de power-up - selon le type
+      // Générer et jouer le son de power-up
+      const buffer = audioBufferGenerator.generatePowerUpSound(type);
+      const dataURI = audioBufferGenerator.createAudioDataURI(buffer);
+      
+      const soundObject = new Audio.Sound();
+      await soundObject.loadAsync({ uri: dataURI });
+      await soundObject.playAsync();
+      
+      // Nettoyer après la lecture
+      setTimeout(() => {
+        soundObject.unloadAsync();
+      }, 1000);
+      
       switch (type) {
         case 'shield':
           await Haptics.heavyAsync();
-          console.log('🎵 Shield power-up sound - deep tone');
+          console.log('🎵 Shield power-up sound played');
           break;
         case 'slow':
           await Haptics.mediumAsync();
-          console.log('🎵 Slow power-up sound - descending tone');
+          console.log('🎵 Slow power-up sound played');
           break;
         case 'magnet':
           await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-          console.log('🎵 Magnet power-up sound - magnetic buzz');
+          console.log('🎵 Magnet power-up sound played');
           break;
         default:
           await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          console.log('🎵 Generic power-up sound');
+          console.log('🎵 Generic power-up sound played');
       }
     } catch (error) {
       console.warn('Power-up sound failed:', error);
@@ -96,9 +139,12 @@ class AudioService {
     if (!this.soundEnabled) return;
     
     try {
-      // Son de collision - impact lourd
+      // Jouer le son de collision
+      if (this.sounds.collision) {
+        await this.sounds.collision.replayAsync();
+      }
       await Haptics.heavyAsync();
-      console.log('🎵 Collision sound - boom!');
+      console.log('🎵 Collision sound played');
     } catch (error) {
       console.warn('Collision sound failed:', error);
     }
@@ -108,9 +154,12 @@ class AudioService {
     if (!this.soundEnabled) return;
     
     try {
-      // Son de score - notification positive
+      // Jouer le son de score
+      if (this.sounds.score) {
+        await this.sounds.score.replayAsync();
+      }
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      console.log('🎵 Score sound - success!');
+      console.log('🎵 Score sound played');
     } catch (error) {
       console.warn('Score sound failed:', error);
     }
@@ -132,9 +181,12 @@ class AudioService {
     if (!this.soundEnabled) return;
     
     try {
-      // Son de game over - son descendant
+      // Jouer le son de game over
+      if (this.sounds.gameOver) {
+        await this.sounds.gameOver.replayAsync();
+      }
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      console.log('🎵 Game over sound - descending tone');
+      console.log('🎵 Game over sound played');
     } catch (error) {
       console.warn('Game over sound failed:', error);
     }
@@ -144,9 +196,12 @@ class AudioService {
     if (!this.soundEnabled) return;
     
     try {
-      // Son de countdown - tic-tac
+      // Jouer le son de countdown
+      if (this.sounds.countdown) {
+        await this.sounds.countdown.replayAsync();
+      }
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      console.log('🎵 Countdown sound - tick!');
+      console.log('🎵 Countdown sound played');
     } catch (error) {
       console.warn('Countdown sound failed:', error);
     }
@@ -160,17 +215,13 @@ class AudioService {
       // Arrêter la musique existante
       await this.stopBackgroundMusic();
       
-      // Dans une vraie app, vous chargeriez des fichiers MP3 différents par niveau
-      // Pour l'instant, nous simulons avec des logs
-      console.log(`🎵 Playing background music for level ${levelId}`);
+      console.log(`🎵 Starting real background music for level ${levelId}`);
       
-      // Simulation de musique de fond avec différentes "temporisations" par niveau
-      const tempo = Math.max(1000 - (levelId * 100), 300); // Plus rapide avec les niveaux
-      
-      // Créer une boucle de musique simulée
-      this.backgroundMusicInterval = setInterval(() => {
-        console.log(`🎵 Background beat - tempo: ${tempo}ms`);
-      }, tempo);
+      // Démarrer la musique de fond avec le générateur
+      backgroundMusicGenerator.startBackgroundMusic(levelId, (frequency) => {
+        // Callback quand une note est jouée (pour debug)
+        console.log(`🎵 Playing note: ${frequency}Hz`);
+      });
       
     } catch (error) {
       console.warn('Background music failed:', error);
@@ -189,6 +240,11 @@ class AudioService {
         await this.backgroundMusic.unloadAsync();
         this.backgroundMusic = null;
       }
+      
+      // Arrêter la musique de fond
+      backgroundMusicGenerator.stopBackgroundMusic();
+      
+      console.log('🎵 Background music stopped');
     } catch (error) {
       console.warn('Stop background music failed:', error);
     }
@@ -245,16 +301,17 @@ class AudioService {
   async cleanup() {
     await this.stopBackgroundMusic();
     
-    // Nettoyer tous les sons chargés
-    Object.values(this.sounds).forEach(async (sound) => {
+    // Nettoyer tous les sons préchargés
+    for (const [key, sound] of Object.entries(this.sounds)) {
       try {
         await sound.unloadAsync();
       } catch (error) {
-        console.warn('Sound cleanup failed:', error);
+        console.warn(`Failed to unload ${key} sound:`, error);
       }
-    });
+    }
     
     this.sounds = {};
+    this.audioBuffers = {};
     this.isInitialized = false;
   }
 }

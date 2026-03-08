@@ -157,6 +157,15 @@ const MenuScreen = ({ navigation }) => {
           </View>
         )}
 
+        {/* Coins display */}
+        {gameData && (
+          <View style={styles.coinDisplay}>
+            <Text style={styles.coinIcon}>🪙</Text>
+            <Text style={styles.coinTotal}>{gameData.totalCoins}</Text>
+            <Text style={styles.coinLabel}>TOTAL COINS</Text>
+          </View>
+        )}
+
         {/* Tabs */}
         <View style={styles.tabs}>
           {["levels", "birds", "stats"].map((tab) => (
@@ -496,6 +505,28 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "900",
     color: "#1E3A8A",
+  },
+  coinDisplay: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginBottom: 16,
+    paddingHorizontal: 20,
+  },
+  coinIcon: {
+    fontSize: 24,
+  },
+  coinTotal: {
+    fontSize: 22,
+    fontWeight: "900",
+    color: "#1E3A8A",
+  },
+  coinLabel: {
+    color: "rgba(30,58,138,0.6)",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1,
   },
 });
 

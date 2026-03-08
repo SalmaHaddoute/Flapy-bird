@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { SCREEN, BIRD, PIPE, GROUND, LEVELS } from "../constants/gameConfig";
+import { SCREEN, BIRD, PIPE, GROUND, LEVELS, COIN, POWERUP } from "../constants/gameConfig";
 
 const PIPE_START_X = SCREEN.WIDTH + 100;
 
@@ -7,12 +7,34 @@ const createPipe = (level) => {
   const minTop = 80;
   const maxTop = SCREEN.HEIGHT - GROUND.HEIGHT - level.pipeGap - 80;
   const topHeight = Math.random() * (maxTop - minTop) + minTop;
+  
+  // Créer une pièce avec une probabilité
+  const coin = Math.random() < COIN.SPAWN_CHANCE ? {
+    id: Date.now() + Math.random() + 0.1,
+    x: PIPE_START_X + PIPE.WIDTH / 2 - COIN.WIDTH / 2,
+    y: topHeight + level.pipeGap / 2 - COIN.HEIGHT / 2,
+    collected: false,
+  } : null;
+  
+  // Créer un power-up avec une probabilité
+  const powerUpTypes = Object.keys(POWERUP.TYPES);
+  const randomPowerUp = powerUpTypes[Math.floor(Math.random() * powerUpTypes.length)];
+  const powerUp = Math.random() < POWERUP.SPAWN_CHANCE ? {
+    id: Date.now() + Math.random() + 0.2,
+    x: PIPE_START_X + PIPE.WIDTH / 2 - POWERUP.WIDTH / 2,
+    y: topHeight + level.pipeGap / 2 - POWERUP.HEIGHT / 2 + 40,
+    type: randomPowerUp,
+    collected: false,
+  } : null;
+  
   return {
     id: Date.now() + Math.random(),
     x: PIPE_START_X,
     topHeight,
     bottomY: topHeight + level.pipeGap,
     passed: false,
+    coin,
+    powerUp,
   };
 };
 
@@ -23,6 +45,9 @@ export const useGameEngine = (level, onGameOver, onScoreUpdate) => {
   const [score, setScore] = useState(0);
   const [isAlive, setIsAlive] = useState(true);
   const [particles, setParticles] = useState([]);
+  const [coins, setCoins] = useState(0);
+  const [activePowerUp, setActivePowerUp] = useState(null);
+  const [powerUpTimer, setPowerUpTimer] = useState(null);
 
   const velocityRef = useRef(0);
   const birdYRef = useRef(SCREEN.HEIGHT / 2 - 50);
@@ -66,12 +91,15 @@ export const useGameEngine = (level, onGameOver, onScoreUpdate) => {
         const pipeLeft = pipe.x;
         const pipeRight = pipe.x + PIPE.WIDTH;
         if (birdRight > pipeLeft && birdLeft < pipeRight) {
-          if (birdTop < pipe.topHeight || birdBottom > pipe.bottomY) return true;
+          // Vérifier le bouclier
+          if (activePowerUp !== 'shield') {
+            if (birdTop < pipe.topHeight || birdBottom > pipe.bottomY) return true;
+          }
         }
       }
       return false;
     },
-    []
+    [activePowerUp]
   );
 
   const gameLoop = useCallback(() => {
@@ -89,18 +117,72 @@ export const useGameEngine = (level, onGameOver, onScoreUpdate) => {
     const rotation = Math.min(Math.max(velocityRef.current * 4, -30), 90);
     setBirdRotation(rotation);
 
+    // Appliquer le ralentissement si power-up actif
+    const pipeSpeed = activePowerUp === 'slow' ? level.pipeSpeed * 0.5 : level.pipeSpeed;
+
     const updatedPipes = pipesRef.current.map((pipe) => ({
       ...pipe,
-      x: pipe.x - level.pipeSpeed,
+      x: pipe.x - pipeSpeed,
     }));
 
     const filtered = updatedPipes.filter((p) => p.x > -PIPE.WIDTH - 10);
 
     let newScore = scoreRef.current;
+    let newCoins = coins;
+    
     const scoredPipes = filtered.map((pipe) => {
       if (!pipe.passed && pipe.x + PIPE.WIDTH < BIRD.X) {
         newScore += 1;
         return { ...pipe, passed: true };
+      }
+      return pipe;
+    });
+
+    // Vérifier les collisions avec les pièces
+    const pipesWithCoins = scoredPipes.map((pipe) => {
+      if (pipe.coin && !pipe.coin.collected) {
+        const birdCenterX = BIRD.X + BIRD.WIDTH / 2;
+        const birdCenterY = newBirdY + BIRD.HEIGHT / 2;
+        const coinCenterX = pipe.coin.x + COIN.WIDTH / 2;
+        const coinCenterY = pipe.coin.y + COIN.HEIGHT / 2;
+        
+        const distance = Math.sqrt(
+          Math.pow(birdCenterX - coinCenterX, 2) + 
+          Math.pow(birdCenterY - coinCenterY, 2)
+        );
+        
+        // Effet aimant si power-up actif
+        const magnetRange = activePowerUp === 'magnet' ? 100 : 30;
+        if (distance < magnetRange) {
+          newCoins += COIN.VALUE;
+          return { ...pipe, coin: { ...pipe.coin, collected: true } };
+        }
+      }
+      return pipe;
+    });
+
+    // Vérifier les collisions avec les power-ups
+    const pipesWithPowerUps = pipesWithCoins.map((pipe) => {
+      if (pipe.powerUp && !pipe.powerUp.collected) {
+        const birdCenterX = BIRD.X + BIRD.WIDTH / 2;
+        const birdCenterY = newBirdY + BIRD.HEIGHT / 2;
+        const powerUpCenterX = pipe.powerUp.x + POWERUP.WIDTH / 2;
+        const powerUpCenterY = pipe.powerUp.y + POWERUP.HEIGHT / 2;
+        
+        const distance = Math.sqrt(
+          Math.pow(birdCenterX - powerUpCenterX, 2) + 
+          Math.pow(birdCenterY - powerUpCenterY, 2)
+        );
+        
+        if (distance < 30) {
+          setActivePowerUp(pipe.powerUp.type);
+          setPowerUpTimer(POWERUP.DURATION);
+          setTimeout(() => {
+            setActivePowerUp(null);
+            setPowerUpTimer(null);
+          }, POWERUP.DURATION);
+          return { ...pipe, powerUp: { ...pipe.powerUp, collected: true } };
+        }
       }
       return pipe;
     });
@@ -110,21 +192,25 @@ export const useGameEngine = (level, onGameOver, onScoreUpdate) => {
       setScore(newScore);
       onScoreUpdate(newScore);
     }
+    
+    if (newCoins !== coins) {
+      setCoins(newCoins);
+    }
 
-    pipesRef.current = scoredPipes;
+    pipesRef.current = pipesWithPowerUps;
 
-    if (checkCollision(newBirdY, scoredPipes)) {
+    if (checkCollision(newBirdY, pipesWithPowerUps)) {
       isAliveRef.current = false;
       setIsAlive(false);
-      onGameOver(scoreRef.current);
+      onGameOver(scoreRef.current, coins);
       return;
     }
 
     setBirdY(newBirdY);
-    setPipes([...scoredPipes]);
+    setPipes([...pipesWithPowerUps]);
 
     frameRef.current = requestAnimationFrame(gameLoop);
-  }, [level, checkCollision, onGameOver, onScoreUpdate]);
+  }, [level, checkCollision, onGameOver, onScoreUpdate, coins, activePowerUp]);
 
   const startPipeSpawner = useCallback(() => {
     const spawn = () => {
@@ -148,6 +234,9 @@ export const useGameEngine = (level, onGameOver, onScoreUpdate) => {
     setScore(0);
     setIsAlive(true);
     setBirdRotation(0);
+    setCoins(0);
+    setActivePowerUp(null);
+    setPowerUpTimer(null);
 
     if (frameRef.current) cancelAnimationFrame(frameRef.current);
     if (pipeTimerRef.current) clearTimeout(pipeTimerRef.current);
@@ -163,5 +252,17 @@ export const useGameEngine = (level, onGameOver, onScoreUpdate) => {
     };
   }, []);
 
-  return { birdY, birdRotation, pipes, score, isAlive, particles, flap, startGame };
+  return { 
+    birdY, 
+    birdRotation, 
+    pipes, 
+    score, 
+    isAlive, 
+    particles, 
+    coins, 
+    activePowerUp, 
+    powerUpTimer,
+    flap, 
+    startGame 
+  };
 };

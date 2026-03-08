@@ -10,8 +10,10 @@ import {
 } from "react-native";
 import Bird from "../components/Bird";
 import Pipe from "../components/Pipe";
+import Coin from "../components/Coin";
+import PowerUp from "../components/PowerUp";
 import { useGameEngine } from "../hooks/useGameEngine";
-import { SCREEN, GROUND, LEVELS } from "../constants/gameConfig";
+import { SCREEN, GROUND, LEVELS, POWERUP } from "../constants/gameConfig";
 import { saveScore } from "../utils/storage";
 
 const { width, height } = Dimensions.get("window");
@@ -24,6 +26,7 @@ const GameScreen = ({ route, navigation }) => {
   const [countdown, setCountdown] = useState(3);
   const [currentScore, setCurrentScore] = useState(0);
   const [finalScore, setFinalScore] = useState(0);
+  const [finalCoins, setFinalCoins] = useState(0);
   const [newBest, setNewBest] = useState(false);
   const [levelUp, setLevelUp] = useState(false);
 
@@ -40,14 +43,15 @@ const GameScreen = ({ route, navigation }) => {
   }, []);
 
   const handleGameOver = useCallback(
-    async (score) => {
+    async (score, coins) => {
       setFinalScore(score);
+      setFinalCoins(coins);
       setGameState("dead");
 
       const prevBest = bestScores[levelId] || 0;
       if (score > prevBest) setNewBest(true);
 
-      await saveScore(levelId, score);
+      await saveScore(levelId, score, coins);
 
       if (score >= level.scoreToAdvance && levelId < LEVELS.length) {
         setLevelUp(true);
@@ -62,7 +66,7 @@ const GameScreen = ({ route, navigation }) => {
     [levelId, level, bestScores]
   );
 
-  const { birdY, birdRotation, pipes, score, isAlive, particles, flap, startGame } =
+  const { birdY, birdRotation, pipes, score, isAlive, particles, coins, activePowerUp, powerUpTimer, flap, startGame } =
     useGameEngine(level, handleGameOver, handleScoreUpdate);
 
   useEffect(() => {
@@ -96,6 +100,7 @@ const GameScreen = ({ route, navigation }) => {
     setNewBest(false);
     setLevelUp(false);
     setCurrentScore(0);
+    setFinalCoins(0);
     setGameState("countdown");
     setCountdown(3);
   }, []);
@@ -139,6 +144,31 @@ const GameScreen = ({ route, navigation }) => {
           <Pipe key={pipe.id} pipe={pipe} levelColor={level.color} />
         ))}
 
+        {/* Coins */}
+        {pipes.map((pipe) => 
+          pipe.coin && !pipe.coin.collected ? (
+            <Coin
+              key={pipe.coin.id}
+              x={pipe.coin.x}
+              y={pipe.coin.y}
+              collected={pipe.coin.collected}
+            />
+          ) : null
+        )}
+
+        {/* Power-ups */}
+        {pipes.map((pipe) => 
+          pipe.powerUp && !pipe.powerUp.collected ? (
+            <PowerUp
+              key={pipe.powerUp.id}
+              x={pipe.powerUp.x}
+              y={pipe.powerUp.y}
+              type={pipe.powerUp.type}
+              collected={pipe.powerUp.collected}
+            />
+          ) : null
+        )}
+
         {/* Bird */}
         <Bird
           y={birdY}
@@ -169,11 +199,23 @@ const GameScreen = ({ route, navigation }) => {
 
         {/* Score HUD */}
         {gameState === "playing" && (
-          <Animated.Text
-            style={[styles.scoreText, { transform: [{ scale: scoreAnim }], color: level.color }]}
-          >
-            {currentScore}
-          </Animated.Text>
+          <>
+            <Animated.Text
+              style={[styles.scoreText, { transform: [{ scale: scoreAnim }], color: level.color }]}
+            >
+              {currentScore}
+            </Animated.Text>
+            <View style={styles.coinHud}>
+              <Text style={styles.coinIcon}>🪙</Text>
+              <Text style={[styles.coinText, { color: level.color }]}>{coins}</Text>
+            </View>
+            {activePowerUp && (
+              <View style={[styles.powerUpHud, { backgroundColor: POWERUP.TYPES[activePowerUp.toUpperCase()].color }]}>
+                <Text style={styles.powerUpIcon}>{POWERUP.TYPES[activePowerUp.toUpperCase()].icon}</Text>
+                <Text style={styles.powerUpTimer}>{Math.ceil(powerUpTimer / 1000)}s</Text>
+              </View>
+            )}
+          </>
         )}
 
         {/* Level Badge */}
@@ -232,6 +274,12 @@ const GameScreen = ({ route, navigation }) => {
                     {newBest ? " ★" : ""}
                   </Text>
                 </View>
+              </View>
+
+              {/* Coins collected */}
+              <View style={styles.coinRow}>
+                <Text style={styles.coinIcon}>🪙</Text>
+                <Text style={[styles.coinValue, { color: level.color }]}>{finalCoins} coins collected!</Text>
               </View>
 
               <Text style={styles.targetText}>
@@ -457,6 +505,55 @@ const styles = StyleSheet.create({
     color: "rgba(30,58,138,0.4)",
     fontSize: 13,
     letterSpacing: 2,
+  },
+  coinHud: {
+    position: "absolute",
+    top: 120,
+    right: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    zIndex: 20,
+  },
+  coinIcon: {
+    fontSize: 20,
+  },
+  coinText: {
+    fontSize: 18,
+    fontWeight: "800",
+  },
+  powerUpHud: {
+    position: "absolute",
+    top: 160,
+    left: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    zIndex: 20,
+  },
+  powerUpIcon: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  powerUpTimer: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  coinRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  coinValue: {
+    fontSize: 18,
+    fontWeight: "800",
   },
 });
 

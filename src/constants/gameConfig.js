@@ -23,6 +23,25 @@ export const GROUND = {
   HEIGHT: 80,
 };
 
+export const COIN = {
+  WIDTH: 24,
+  HEIGHT: 24,
+  VALUE: 1,
+  SPAWN_CHANCE: 0.3, // 30% de chance d'apparaître avec un tuyau
+};
+
+export const POWERUP = {
+  WIDTH: 32,
+  HEIGHT: 32,
+  DURATION: 5000, // 5 secondes
+  SPAWN_CHANCE: 0.1, // 10% de chance d'apparaître
+  TYPES: {
+    SHIELD: { id: 'shield', color: '#4ade80', icon: '🛡️' },
+    SLOW: { id: 'slow', color: '#60a5fa', icon: '⏱️' },
+    MAGNET: { id: 'magnet', color: '#f59e0b', icon: '🧲' },
+  },
+};
+
 export const LEVELS = [
   {
     id: 1,

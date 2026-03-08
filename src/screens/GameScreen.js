@@ -15,7 +15,7 @@ import PowerUp from "../components/PowerUp";
 import { useGameEngine } from "../hooks/useGameEngine";
 import { SCREEN, GROUND, LEVELS, POWERUP } from "../constants/gameConfig";
 import { saveScore } from "../utils/storage";
-import audioServiceV2 from "../services/audioServiceV2";
+import audioServiceV3 from "../services/audioServiceV3";
 
 const { width, height } = Dimensions.get("window");
 
@@ -38,7 +38,7 @@ const GameScreen = ({ route, navigation }) => {
   const handleScoreUpdate = useCallback((score) => {
     setCurrentScore(score);
     // Son de score
-    audioServiceV2.playScore();
+    audioServiceV3.playScore();
     Animated.sequence([
       Animated.timing(scoreAnim, { toValue: 1.4, duration: 80, useNativeDriver: true }),
       Animated.timing(scoreAnim, { toValue: 1, duration: 120, useNativeDriver: true }),
@@ -52,14 +52,14 @@ const GameScreen = ({ route, navigation }) => {
       setGameState("dead");
 
       // Son de game over
-      audioServiceV2.playGameOver();
-      audioServiceV2.playVoiceOver('game_over');
+      audioServiceV3.playGameOver();
+      audioServiceV3.playVoiceOver('game_over');
 
       const prevBest = bestScores[levelId] || 0;
       if (score > prevBest) {
         setNewBest(true);
         // Voix off pour meilleur score
-        audioServiceV2.playVoiceOver('best_score');
+        audioServiceV3.playVoiceOver('best_score');
       }
 
       await saveScore(levelId, score, coins);
@@ -67,7 +67,7 @@ const GameScreen = ({ route, navigation }) => {
       if (score >= level.scoreToAdvance && levelId < LEVELS.length) {
         setLevelUp(true);
         // Voix off pour niveau débloqué
-        audioServiceV2.playVoiceOver('level_unlocked');
+        audioServiceV3.playVoiceOver('level_unlocked');
       }
 
       Animated.timing(deathAnim, {
@@ -84,11 +84,11 @@ const GameScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     // Initialiser le service audio
-    audioServiceV2.initialize();
+    audioServiceV3.initialize();
     
     // Démarrer la musique de fond
     if (gameState === "countdown") {
-      audioServiceV2.playBackgroundMusic(levelId);
+      audioServiceV3.playBackgroundMusic(levelId);
     }
     
     if (gameState === "countdown") {
@@ -103,7 +103,7 @@ const GameScreen = ({ route, navigation }) => {
         } else {
           setCountdown(c);
           // Son de countdown
-          audioServiceV2.playCountdown();
+          audioServiceV3.playCountdown();
           Animated.sequence([
             Animated.timing(countdownAnim, { toValue: 1.8, duration: 200, useNativeDriver: true }),
             Animated.timing(countdownAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
@@ -118,14 +118,14 @@ const GameScreen = ({ route, navigation }) => {
     if (gameState === "playing") {
       flap();
       // Son de battement d'ailes
-      audioServiceV2.playFlap();
+      audioServiceV3.playFlap();
     }
   }, [gameState, flap]);
 
   useEffect(() => {
     // Nettoyer l'audio quand on quitte l'écran
     return () => {
-      audioServiceV2.stopBackgroundMusic();
+      audioServiceV3.stopBackgroundMusic();
     };
   }, []);
 

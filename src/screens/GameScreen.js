@@ -91,10 +91,6 @@ const GameScreen = ({ route, navigation }) => {
       setSelectedBird(data.selectedBird || "yellow");
     });
 
-    // Initialiser l'état audio
-    setSoundEnabled(audioServiceV3.soundEnabled);
-    setHapticEnabled(audioServiceV3.hapticEnabled);
-
     Animated.loop(
       Animated.sequence([
         Animated.timing(floatAnim, { toValue: 1, duration: 1200, useNativeDriver: true }),

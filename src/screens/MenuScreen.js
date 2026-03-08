@@ -326,13 +326,6 @@ const MenuScreen = ({ navigation }) => {
                   </View>
                 );
               })}
-              
-              {/* Bouton pour statistiques détaillées */}
-              <TouchableWithoutFeedback onPress={() => navigation.navigate('Stats')}>
-                <View style={styles.detailedStatsButton}>
-                  <Text style={styles.detailedStatsButtonText}>📊 Voir Statistiques Détaillées</Text>
-                </View>
-              </TouchableWithoutFeedback>
             </View>
           )}
 
@@ -603,19 +596,6 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     color: "rgba(30,58,138,0.6)",
   },
-  detailedStatsButton: {
-    backgroundColor: "#1a5490",
-    borderRadius: 12,
-    padding: 15,
-    alignItems: "center",
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  detailedStatsButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
+  });
 
 export default MenuScreen;

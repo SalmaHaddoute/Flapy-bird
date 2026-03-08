@@ -108,40 +108,6 @@ export const savePowerUpCollected = async (powerUpType, levelId, gameScore) => {
   }
 };
 
-export const getDetailedStats = async () => {
-  try {
-    const data = await loadGameData();
-    
-    // Retourner des statistiques simples
-    return {
-      globalStats: {
-        total_score: data.totalScore,
-        total_coins: data.totalCoins,
-        games_played: data.gamesPlayed,
-        best_level: data.bestLevel,
-        current_bird: data.selectedBird
-      },
-      topScores: Object.entries(data.bestScores).map(([levelId, score]) => ({
-        level_id: parseInt(levelId),
-        best_score: score,
-        best_coins: 0,
-        bird_color: data.selectedBird
-      })),
-      recentGames: [],
-      popularPowerUps: [],
-      levelProgression: Object.entries(data.bestScores).map(([levelId, score]) => ({
-        level_id: parseInt(levelId),
-        games_played: 1,
-        avg_score: score,
-        max_score: score
-      }))
-    };
-  } catch (error) {
-    console.error('Error getting detailed stats:', error);
-    return null;
-  }
-};
-
 export const resetGameData = async () => {
   try {
     await AsyncStorage.multiRemove([

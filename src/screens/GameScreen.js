@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   star: {
     position: "absolute",
     borderRadius: 2,
-    backgroundColor: "white",
+    backgroundColor: "#FFFFFF",
   },
   ground: {
     position: "absolute",
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
   },
   groundLine: {
     height: 3,
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: "rgba(0,0,0,0.1)",
     marginTop: 4,
   },
   particle: {
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     fontSize: 52,
     fontWeight: "900",
     zIndex: 20,
-    textShadowColor: "rgba(0,0,0,0.5)",
+    textShadowColor: "rgba(0,0,0,0.3)",
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 6,
   },
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
     zIndex: 20,
   },
   bestText: {
-    color: "rgba(255,255,255,0.5)",
+    color: "rgba(30,58,138,0.6)",
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 1,
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(255,255,255,0.3)",
     zIndex: 30,
   },
   levelTitle: {
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   levelSubtitle: {
-    color: "rgba(255,255,255,0.6)",
+    color: "rgba(30,58,138,0.6)",
     fontSize: 14,
     marginBottom: 40,
     letterSpacing: 2,
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   tapHint: {
-    color: "rgba(255,255,255,0.5)",
+    color: "rgba(30,58,138,0.6)",
     fontSize: 12,
     letterSpacing: 3,
   },
@@ -369,19 +369,19 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.7)",
+    backgroundColor: "rgba(255,255,255,0.4)",
     zIndex: 30,
   },
   deathCard: {
     width: 300,
     borderWidth: 1,
     borderRadius: 16,
-    backgroundColor: "#0a0a1a",
+    backgroundColor: "rgba(255,255,255,0.95)",
     padding: 28,
     alignItems: "center",
   },
   gameOverText: {
-    color: "#fff",
+    color: "#1E3A8A",
     fontSize: 26,
     fontWeight: "900",
     letterSpacing: 4,
@@ -411,10 +411,10 @@ const styles = StyleSheet.create({
   scoreDivider: {
     width: 1,
     height: 40,
-    backgroundColor: "rgba(255,255,255,0.15)",
+    backgroundColor: "rgba(30,58,138,0.15)",
   },
   scoreLabel: {
-    color: "rgba(255,255,255,0.4)",
+    color: "rgba(30,58,138,0.4)",
     fontSize: 11,
     letterSpacing: 2,
     marginBottom: 4,
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
     fontWeight: "900",
   },
   targetText: {
-    color: "rgba(255,255,255,0.3)",
+    color: "rgba(30,58,138,0.4)",
     fontSize: 11,
     letterSpacing: 1,
     marginBottom: 24,
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   btnMenuText: {
-    color: "rgba(255,255,255,0.4)",
+    color: "rgba(30,58,138,0.4)",
     fontSize: 13,
     letterSpacing: 2,
   },

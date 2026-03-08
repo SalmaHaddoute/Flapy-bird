@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   pipe: {
     position: "absolute",
     width: PIPE.WIDTH,
-    backgroundColor: "#1a1a2e",
+    backgroundColor: "#228B22",
     borderWidth: 2,
     borderRadius: 4,
     overflow: "visible",

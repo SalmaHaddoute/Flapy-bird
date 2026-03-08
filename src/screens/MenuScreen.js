@@ -293,12 +293,12 @@ const MenuScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#050510",
+    backgroundColor: "#87CEEB",
   },
   star: {
     position: "absolute",
     borderRadius: 2,
-    backgroundColor: "white",
+    backgroundColor: "#FFFFFF",
   },
   content: {
     flex: 1,
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    color: "#fff",
+    color: "#1E3A8A",
     fontSize: 40,
     fontWeight: "900",
     letterSpacing: 8,
@@ -332,12 +332,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   statValue: {
-    color: "#fff",
+    color: "#1E3A8A",
     fontSize: 18,
     fontWeight: "800",
   },
   statLabel: {
-    color: "rgba(255,255,255,0.3)",
+    color: "rgba(30,58,138,0.6)",
     fontSize: 9,
     letterSpacing: 2,
     marginTop: 2,
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginHorizontal: 16,
     marginBottom: 16,
-    backgroundColor: "#0a0a1a",
+    backgroundColor: "rgba(255,255,255,0.9)",
     borderRadius: 12,
     padding: 4,
   },
@@ -357,16 +357,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   tabActive: {
-    backgroundColor: "#1a1a2e",
+    backgroundColor: "#E0F2FE",
   },
   tabText: {
-    color: "rgba(255,255,255,0.3)",
+    color: "rgba(30,58,138,0.6)",
     fontSize: 11,
     fontWeight: "700",
     letterSpacing: 1,
   },
   tabTextActive: {
-    color: "#fff",
+    color: "#1E3A8A",
   },
   scrollArea: {
     flex: 1,
@@ -376,14 +376,14 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   levelCard: {
-    backgroundColor: "#0a0a1a",
+    backgroundColor: "rgba(255,255,255,0.9)",
     borderWidth: 1,
     borderRadius: 14,
     padding: 18,
     alignItems: "center",
   },
   levelCardLocked: {
-    backgroundColor: "#070710",
+    backgroundColor: "rgba(255,255,255,0.5)",
   },
   levelEmoji: {
     fontSize: 32,
@@ -396,7 +396,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   levelSub: {
-    color: "rgba(255,255,255,0.3)",
+    color: "rgba(30,58,138,0.6)",
     fontSize: 11,
     letterSpacing: 1,
     marginBottom: 14,
@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
   progressBar: {
     width: "80%",
     height: 4,
-    backgroundColor: "#1a1a2e",
+    backgroundColor: "#E0F2FE",
     borderRadius: 2,
     marginBottom: 4,
     overflow: "hidden",
@@ -414,13 +414,13 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   progressText: {
-    color: "rgba(255,255,255,0.3)",
+    color: "rgba(30,58,138,0.6)",
     fontSize: 10,
     letterSpacing: 1,
     marginBottom: 14,
   },
   unlockHint: {
-    color: "rgba(255,255,255,0.2)",
+    color: "rgba(30,58,138,0.4)",
     fontSize: 10,
     letterSpacing: 1,
     marginBottom: 6,
@@ -445,9 +445,9 @@ const styles = StyleSheet.create({
   },
   birdCard: {
     width: 130,
-    backgroundColor: "#0a0a1a",
+    backgroundColor: "rgba(255,255,255,0.9)",
     borderWidth: 1,
-    borderColor: "#1a1a2e",
+    borderColor: "#E0F2FE",
     borderRadius: 14,
     padding: 16,
     alignItems: "center",
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
   recordRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#0a0a1a",
+    backgroundColor: "rgba(255,255,255,0.9)",
     borderRadius: 12,
     padding: 14,
     borderLeftWidth: 3,
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   recordTarget: {
-    color: "rgba(255,255,255,0.3)",
+    color: "rgba(30,58,138,0.6)",
     fontSize: 10,
     letterSpacing: 1,
     marginTop: 2,
@@ -495,6 +495,7 @@ const styles = StyleSheet.create({
   recordScore: {
     fontSize: 22,
     fontWeight: "900",
+    color: "#1E3A8A",
   },
 });
 

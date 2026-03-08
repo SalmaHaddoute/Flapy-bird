@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "Flappy Nova",
+    "slug": "flappy-nova",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#050510"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.yourname.flappynova"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#050510"
+      },
+      "package": "com.yourname.flappynova"
+    },
+    "web": {},
+    "plugins": [
+      "expo-asset"
+    ]
+  }
+}

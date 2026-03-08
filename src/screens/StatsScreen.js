@@ -8,7 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { getDetailedStats, resetGameData, initializeDatabase } from '../utils/storageV3';
-import audioServiceV3 from '../services/audioServiceV3';
+import audioServiceV4 from "../services/audioServiceV4";
 
 const { width, height } = Dimensions.get('window');
 
@@ -35,7 +35,7 @@ const StatsScreen = ({ navigation }) => {
   const handleReset = async () => {
     try {
       await resetGameData();
-      audioServiceV3.playVoiceOver('game_over');
+      audioServiceV4.playVoiceOver('game_over');
       loadStats();
     } catch (error) {
       console.error('Error resetting data:', error);

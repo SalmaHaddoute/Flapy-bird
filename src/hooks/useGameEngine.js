@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { SCREEN, BIRD, PIPE, GROUND, LEVELS, COIN, POWERUP } from "../constants/gameConfig";
-import audioServiceV3 from "../services/audioServiceV3";
+import audioServiceV4 from "../services/audioServiceV4";
 import { savePowerUpCollected } from "../utils/storageV3";
 
 const PIPE_START_X = SCREEN.WIDTH + 100;
@@ -158,7 +158,7 @@ export const useGameEngine = (level, onGameOver, onScoreUpdate) => {
         if (distance < magnetRange) {
           newCoins += COIN.VALUE;
           // Son de pièce collectée
-          audioServiceV3.playCoin();
+          audioServiceV4.playCoin();
           return { ...pipe, coin: { ...pipe.coin, collected: true } };
         }
       }
@@ -182,8 +182,8 @@ export const useGameEngine = (level, onGameOver, onScoreUpdate) => {
           setActivePowerUp(pipe.powerUp.type);
           setPowerUpTimer(POWERUP.DURATION);
           // Son de power-up activé
-          audioServiceV3.playPowerUp(pipe.powerUp.type);
-          audioServiceV3.playVoiceOver('powerup_activated');
+          audioServiceV4.playPowerUp(pipe.powerUp.type);
+          audioServiceV4.playVoiceOver('powerup_activated');
           
           // Enregistrer le power-up collecté dans SQLite
           savePowerUpCollected(pipe.powerUp.type, level.id, scoreRef.current);
@@ -214,7 +214,7 @@ export const useGameEngine = (level, onGameOver, onScoreUpdate) => {
       isAliveRef.current = false;
       setIsAlive(false);
       // Son de collision
-      audioServiceV3.playCollision();
+      audioServiceV4.playCollision();
       onGameOver(scoreRef.current, coins);
       return;
     }

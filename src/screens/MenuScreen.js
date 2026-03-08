@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { LEVELS, BIRD_COLORS } from "../constants/gameConfig";
 import { loadGameData, saveSelectedBird } from "../utils/storage";
-import audioService from "../services/audioService";
+import audioServiceV2 from "../services/audioServiceV2";
 
 const BirdPreview = ({ color, size = 44 }) => {
   const c = BIRD_COLORS.find((b) => b.id === color) || BIRD_COLORS[0];
@@ -70,8 +70,8 @@ const MenuScreen = ({ navigation }) => {
     });
 
     // Initialiser l'état audio
-    setSoundEnabled(audioService.soundEnabled);
-    setHapticEnabled(audioService.hapticEnabled);
+    setSoundEnabled(audioServiceV2.soundEnabled);
+    setHapticEnabled(audioServiceV2.hapticEnabled);
 
     Animated.loop(
       Animated.sequence([
@@ -89,12 +89,12 @@ const MenuScreen = ({ navigation }) => {
   }, []);
 
   const toggleSound = useCallback(() => {
-    const newState = audioService.toggleSound();
+    const newState = audioServiceV2.toggleSound();
     setSoundEnabled(newState);
   }, []);
 
   const toggleHaptic = useCallback(() => {
-    const newState = audioService.toggleHaptic();
+    const newState = audioServiceV2.toggleHaptic();
     setHapticEnabled(newState);
   }, []);
 

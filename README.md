@@ -1,6 +1,6 @@
-# 🐦 Flappy Nova — React Native Game
+# 🐦 Sky Bird Adventure — React Native Game
 
-A feature-rich Flappy Bird clone built with **React Native + Expo 52**.
+A feature-rich Sky Bird Adventure game built with **React Native + Expo 52**.
 
 ## ✅ Compatible
 - Windows, Mac, Linux

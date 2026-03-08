@@ -152,8 +152,8 @@ const MenuScreen = ({ navigation }) => {
           <Animated.View style={{ transform: [{ translateY: birdFloat }] }}>
             <BirdPreview color={selectedBird} size={64} />
           </Animated.View>
-          <Text style={styles.title}>FLAPPY</Text>
-          <Text style={styles.titleSub}>NOVA</Text>
+          <Text style={styles.title}>SKY BIRD</Text>
+          <Text style={styles.titleSub}>ADVENTURE</Text>
         </View>
 
         {/* Audio Controls */}

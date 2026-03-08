@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Flappy Nova",
-    "slug": "flappy-nova",
+    "name": "Sky Bird Adventure",
+    "slug": "sky-bird-adventure",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
@@ -15,13 +15,13 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.yourname.flappynova"
+      "bundleIdentifier": "com.yourname.skybirdadventure"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#050510"
       },
-      "package": "com.yourname.flappynova"
+      "package": "com.yourname.skybirdadventure"
     },
     "web": {},
     "plugins": [

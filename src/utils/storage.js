@@ -1,12 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const KEYS = {
-  BEST_SCORES: "flappy_best_scores",
-  TOTAL_SCORE: "flappy_total_score",
-  BEST_LEVEL: "flappy_best_level",
-  SELECTED_BIRD: "flappy_selected_bird",
-  GAMES_PLAYED: "flappy_games_played",
-  TOTAL_COINS: "flappy_total_coins",
+  BEST_SCORES: "skybird_best_scores",
+  TOTAL_SCORE: "skybird_total_score",
+  BEST_LEVEL: "skybird_best_level",
+  SELECTED_BIRD: "skybird_selected_bird",
+  GAMES_PLAYED: "skybird_games_played",
+  TOTAL_COINS: "skybird_total_coins",
 };
 
 export const saveScore = async (level, score, coins = 0) => {
